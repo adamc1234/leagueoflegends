@@ -1,0 +1,44 @@
+local version = 0.01
+if not VIP_USER or myHero.charName ~= "Gragas" then return end
+--UPDATER
+    function Initiate()
+        local scriptName = "CommunityGragas"
+        printMessage = function(message) print("<font color=\"#00A300\">"..scriptName..":</font> <font color=\"#FFFFFF\">"..message.."</font>") end
+        if FileExist(LIB_PATH.."SourceLib.lua") then
+            require 'SourceLib'
+        else
+            printMessage("Downloading SourceLib")
+            DownloadFile("https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua",LIB_PATH.."SourceLib.lua", function() printMessage("Source Lib update.") end)
+            return true
+        end
+    end
+    if Initiate() then return end
+    printMessage("Loaded Successfully")
+
+--SPELL DATA
+    local Gragas = {
+        Q = {range = 850, speed = 1000, delay = 0.5, width = 110, collision = false, DamageType = _MAGIC, BaseDamage = 80, DamagePerLevel = 40, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.0, Extra = function() return (myHero:CanUseSpell(_Q) == READY) end},
+        W = {range = 0, speed = 828.5, delay = 0.5, width = 0, collision = false, DamageType = _MAGIC, BaseDamage = 20, DamagePerLevel = 30, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.0, Extra = function() return (myHero:CanUseSpell(_W) == READY) end},
+        E = {range = 600, speed = 20, delay = 0.5, collision = true, DamageType = _MAGIC, BaseDamage = 200, DamagePerLevel = 100, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.0, Extra = function() return (myHero:CanUseSpell(_E) == READY) end},
+        R = {range = 1150, speed = 200, delay = 0.5, collision = false DamageType = _MAGIC, BaseDamage = 80, DamagePerLevel = 50, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.0, Extra = function() return (myHero:CanUseSpell(_R) == READY) end}
+    }
+
+--LOAD
+    function OnLoad()
+        --Load
+            VP = VPrediction(true)
+            OW = SOW(VP)
+            OW:RegisterAfterAttackCallback(AutoAttackReset)
+            TS = SimpleTS(STS_LESS_CAST_MAGIC)
+            Selector.Instance()
+            SpellQ = Spell(_Q, Gragas.Q["range"]):SetSkillshot(VP, SKILLSHOT_CIRCULAR, Gragas.Q["width"], Gragas.Q["delay"], Gragas.Q["speed"], Gragas.Q["collision"])
+            SpellW = Spell(_W, Gragas.W["range"]):SetSkillshot(VP, SKILLSHOT_LINEAR, Gragas.W["width"], Gragas.W["delay"], Gragas.W["speed"], Gragas.W["collision"])
+            SpellE = Spell(_E, Gragas.E["range"]):SetSkillshot(VP, SKILLSHOT_LINEAR, Gragas.E["width"], Gragas.E["delay"], Gragas.E["speed"], Gragas.E["collision"])
+            SpellR = Spell(_R, Gragas.R["range"]):SetSkillshot(VP, SKILLSHOT_CIRCULAR, Gragas.R["width"], Gragas.R["delay"], Gragas.R["speed"], Gragas.R["collision"]))
+
+--DMG CALC
+            DamageCalculator = DamageLib()
+            DamageCalculator:RegisterDamageSource(_Q, Gragas.Q["DamageType"], Gragas.Q["BaseDamage"], Gragas.Q["DamagePerLevel"], Gragas.Q["ScalingStat"], Gragas.Q["PercentScaling"], Gragas.Q["Condition"], Gragas.Q["Extra"])
+            DamageCalculator:RegisterDamageSource(_W, Gragas.W["DamageType"], Gragas.W["BaseDamage"], Gragas.W["DamagePerLevel"], Gragas.W["ScalingStat"], Gragas.W["PercentScaling"], Gragas.W["Condition"], Gragas.W["Extra"])
+            DamageCalculator:RegisterDamageSource(_E, Gragas.E["DamageType"], Gragas.E["BaseDamage"], Gragas.E["DamagePerLevel"], Gragas.E["ScalingStat"], Gragas.E["PercentScaling"], Gragas.E["Condition"], Gragas.E["Extra"])
+            DamageCalculator:RegisterDamageSource(_R, Gragas.R["DamageType"], Gragas.R["BaseDamage"], Gragas.R["DamagePerLevel"], Gragas.R["ScalingStat"], Gragas.R["PercentScaling"], Gragas.R["Condition"], Gragas.R["Extra"])
